@@ -1,5 +1,8 @@
 from monitor import check_website
 
+from database import save_result, count_results
+
+
 def main():
 
     # websites to check 
@@ -22,6 +25,9 @@ def main():
         print("-" * 40)
 
         result = check_website(website)
+
+        # save via SQL Lite Database
+        save_result(result)
 
         response_time = result["response_time"]
 
@@ -72,6 +78,7 @@ def main():
     print(f"Websites With Errors: {error_count}")
     print(f"Websites Offline: {offline_count}")
     print(f"Online Percentage: {percentage_online_count:.2f}%")
+    print(f"Total Historical Checks: {count_results()}")
 
 
 if __name__ == "__main__":

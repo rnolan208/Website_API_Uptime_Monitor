@@ -15,3 +15,9 @@ htmlcov/
 
 # Editor
 .vscode/
+
+# SQLite database
+monitor.db
+monitor.db-journal
+monitor.db-wal
+monitor.db-shm
