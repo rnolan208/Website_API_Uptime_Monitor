@@ -1,6 +1,6 @@
 from monitor import check_website
 
-from database import save_result, count_results
+from database import save_result, count_results, count_website_checks, count_successful_checks, average_response_time, get_recent_checks
 
 
 def main():
@@ -26,7 +26,7 @@ def main():
 
         result = check_website(website)
 
-        # save via SQL Lite Database
+        # save via SQLite Database
         save_result(result)
 
         response_time = result["response_time"]
@@ -79,6 +79,51 @@ def main():
     print(f"Websites Offline: {offline_count}")
     print(f"Online Percentage: {percentage_online_count:.2f}%")
     print(f"Total Historical Checks: {count_results()}")
+
+
+    print("\nHistorical Website Statistics")
+    print("-" * 40)
+    
+
+    for website in websites:
+        total_checks = count_website_checks(website)
+        successful_checks = count_successful_checks(website)
+        average_time = average_response_time(website)
+
+        if total_checks > 0:
+            website_uptime = (successful_checks / total_checks) * 100
+        else:
+            website_uptime = 0
+
+        if average_time is None:
+            display_time = "N/A"
+        else:
+            display_time = f"{average_time:.2f} ms"
+
+        print(f"\nWebsite: {website}")
+        print(f"Total Checks: {total_checks}")
+        print(f"Successful Checks: {successful_checks}")
+        print(f"Website Observed Uptime: {website_uptime:.2f}%")
+        print(f"Average Response Time: {display_time}")
+
+
+
+    print("\nRecent Invalid Domain Checks")
+    print("-" * 40)
+
+    recent_checks = get_recent_checks("https://nonexistent.invalid")
+
+    for check in recent_checks:
+        status = check[1]
+        response_time = check[2]
+        checked_at = check[3]
+
+        if response_time is None:
+            display_time = "N/A"
+        else:
+            display_time = f"{response_time:.2f} ms"
+
+        print(f"{status} | {display_time} | {checked_at}")
 
 
 if __name__ == "__main__":

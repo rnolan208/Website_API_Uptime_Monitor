@@ -1,5 +1,6 @@
 import sqlite3
 
+# Saves a website monitoring result to the SQLite database
 def save_result(result):
     connection = sqlite3.connect("monitor.db")
 
@@ -39,6 +40,7 @@ def save_result(result):
     connection.close()
 
 
+# Count the total number of monitoring checks which are stored in the database
 def count_results():
 
     connection = sqlite3.connect("monitor.db")
@@ -53,4 +55,73 @@ def count_results():
 
     return total
 
+
+# Counts the total number of historical checks for a specific website
+def count_website_checks(url):
+
+    connection = sqlite3.connect("monitor.db")
+    cursor = connection.cursor()
     
+    cursor.execute(
+    "SELECT COUNT(*) FROM monitoring_results WHERE url = ?", (url,))
+
+    result = cursor.fetchone()
+    checks = result[0]
+
+    connection.close()
+    
+    return checks
+
+
+# Counts the number of "ONLINE" checks for a specific website
+def count_successful_checks(url):
+
+    connection = sqlite3.connect("monitor.db")
+    cursor = connection.cursor()
+
+    cursor.execute(
+    "SELECT COUNT(*) FROM monitoring_results WHERE url = ? AND status = 'ONLINE'", (url,)
+    )
+
+    result = cursor.fetchone()
+    successful_checks = result[0]
+    
+    connection.close()
+        
+    return successful_checks
+
+
+# Calculates the average recorded response time for a specific website
+def average_response_time(url):
+
+    connection = sqlite3.connect("monitor.db")
+    cursor = connection.cursor()
+    
+    cursor.execute(
+    "SELECT AVG(response_time) FROM monitoring_results WHERE url = ?;", (url,)
+    )
+
+    result = cursor.fetchone()
+    average_response = result[0]
+
+    connection.close()
+
+    return average_response
+
+
+# Gets the five most recent monitoring checks for a specific website
+def get_recent_checks(url):
+
+    connection = sqlite3.connect("monitor.db")
+    cursor = connection.cursor()
+
+    cursor.execute(
+    "SELECT url, status, response_time, checked_at FROM monitoring_results WHERE url = ? ORDER BY checked_at DESC, id DESC LIMIT 5;", 
+    (url,)
+    )
+
+    records = cursor.fetchall()
+
+    connection.close()
+
+    return records
