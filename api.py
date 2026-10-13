@@ -1,6 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+
+from monitor import check_website
 
 from database import (
+    save_result,
     count_results,
     get_recent_checks,
     count_website_checks,
@@ -8,7 +11,21 @@ from database import (
     average_response_time
 )
 
+from pydantic import BaseModel
+
 app = FastAPI()
+
+class WebsiteCheckRequest(BaseModel):
+    url: str
+
+
+MONITORED_WEBSITES = [
+    "https://www.google.com",
+    "https://www.github.com",
+    "https://www.python.org",
+    "https://httpbin.org/status/404",
+    "https://nonexistent.invalid"
+]
 
 
 @app.get("/health")
@@ -18,16 +35,8 @@ def health_check():
 
 @app.get("/websites")
 def get_websites():
-
-    websites = [
-        "https://www.google.com",
-        "https://www.github.com",
-        "https://www.python.org",
-        "https://httpbin.org/status/404",
-        "https://nonexistent.invalid"
-    ]
     
-    return {"websites": websites}
+    return {"websites": MONITORED_WEBSITES}
 
 
 @app.get("/stats")
@@ -75,3 +84,22 @@ def get_website_stats(url: str):
         "uptime_percentage": uptime,
         "average_response_time": average_time
     }
+
+
+@app.post("/check")
+def run_website_check(request: WebsiteCheckRequest):
+    """Validates a monitored URL, then runs a website check and saves the result."""
+
+    if request.url not in MONITORED_WEBSITES:
+        raise HTTPException(
+            status_code=400,
+            detail="Website is not in the monitored list"
+        )
+
+    result = check_website(request.url)
+
+    save_result(result)
+
+    return result
+
+    
