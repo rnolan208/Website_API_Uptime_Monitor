@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website & API Uptime Monitor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>Website & API Uptime Monitor</h1>
+        <p>Monitor website availability, performance and uptime.</p>
+    </header>
+
+    <main>
+
+        <section class="dashboard-overview">
+            <h2>Dashboard Overview</h2>
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <h3>Total Websites</h3>
+                    <p id="total-websites">0</p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Online Websites</h3>
+                    <p id="online-websites">0</p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Total Checks</h3>
+                    <p>0</p>
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="monitored-websites">
+
+            <div class="section-header">
+                <h2>Monitored Websites</h2>
+                <button id="run-all-checks">Run All Checks</button>
+            </div>
+
+            <div class="websites-list">
+
+                <div class="website-card">
+
+                    <div class="website-info">
+                        <h3>Google</h3>
+                        <p>https://www.google.com</p>
+                    </div>
+
+                    <div class="website-status">
+                        <span class="status-badge">ONLINE</span>
+                        <p>—</p>
+                    </div>
+
+                </div>
+
+
+                <div class="website-card">
+
+                    <div class="website-info">
+                        <h3>Github</h3>
+                        <p>https://www.github.com</p>
+                    </div>
+
+                    <div class="website-status">
+                        <span class="status-badge">ONLINE</span>
+                        <p>—</p>
+                    </div>
+
+                </div>
+
+
+                <div class="website-card">
+
+                    <div class="website-info">
+                        <h3>Python</h3>
+                        <p>https://www.python.org</p>
+                    </div>
+
+                    <div class="website-status">
+                        <span class="status-badge">Not Checked</span>
+                        <p>—</p>
+                    </div>
+
+                </div>
+
+
+                <div class="website-card">
+
+                    <div class="website-info">
+                        <h3>Status 404</h3>
+                        <p>https://httpbin.org/status/404</p>
+                    </div>
+
+                    <div class="website-status">
+                        <span class="status-badge">Not Checked</span>
+                        <p>—</p>
+                    </div>
+
+                </div>
+
+
+                <div class="website-card">
+
+                    <div class="website-info">
+                        <h3>Nonexistent</h3>
+                        <p>https://nonexistent.invalid</p>
+                    </div>
+
+                    <div class="website-status">
+                        <span class="status-badge">Not Checked</span>
+                        <p>—</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

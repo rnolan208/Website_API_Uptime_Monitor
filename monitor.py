@@ -15,7 +15,7 @@ def check_website(url):
         start_time = time.perf_counter()
 
         # sends the GET request
-        response = requests.get(url, timeout=10)
+        response = requests.get(url, timeout=10, allow_redirects=False)
 
         end_time = time.perf_counter()
 
