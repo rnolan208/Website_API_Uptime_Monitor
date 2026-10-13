@@ -144,3 +144,19 @@ main {
         flex-direction: column;
     }
 }
+
+
+.status-badge.online {
+    background-color: #166534;
+    color: #dcfce7;
+}
+
+.status-badge.error {
+    background-color: #92400e;
+    color: #fef3c7;
+}
+
+.status-badge.offline {
+    background-color: #991b1b;
+    color: #fee2e2;
+}
