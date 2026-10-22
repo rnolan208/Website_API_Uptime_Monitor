@@ -54,6 +54,12 @@ function loadWebsiteStatus(url, statusElementId, responseTimeElementId) {
     const statusElement = document.getElementById(statusElementId);
     const responseTimeElement = document.getElementById(responseTimeElementId);
 
+
+    // Using existing check names, ie google, and replacing the status with last-checked
+    const lastCheckedElementId = statusElementId.replace("-status", "-last-checked");
+
+    const lastCheckedElement = document.getElementById(lastCheckedElementId);
+
     const apiUrl = "http://127.0.0.1:8000/checks?url=" + encodeURIComponent(url);
 
     return fetch(apiUrl)
@@ -82,6 +88,11 @@ function loadWebsiteStatus(url, statusElementId, responseTimeElementId) {
                 } else {
                     responseTimeElement.textContent = "Unavailable";
                 }
+
+                const checkedDate = new Date(latestCheck.checked_at);
+
+                lastCheckedElement.textContent =
+                    "Last checked: " + checkedDate.toLocaleString("en-IE");
 
                 updateOnlineCount();
             }
@@ -181,8 +192,8 @@ runAllChecksButton.addEventListener("click", async function () {
         }
 
         const stats = await statsResponse.json();
--
-        console.log("All website checks finished:", results);
+        
+            console.log("All website checks finished:", results);
 
         // All checks are finished. Now update the cards together.
         results.forEach((result, index) => {
@@ -209,6 +220,15 @@ runAllChecksButton.addEventListener("click", async function () {
             } else {
                 responseTimeElement.textContent = "Unavailable";
             }
+
+            const lastCheckedElement = document.getElementById(
+                websiteId + "-last-checked"
+            );
+
+            const checkedDate = new Date(check.checked_at);
+
+            lastCheckedElement.textContent =
+                "Last checked: " + checkedDate.toLocaleString("en-IE");
 
         });
 
