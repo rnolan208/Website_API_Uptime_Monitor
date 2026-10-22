@@ -1,10 +1,6 @@
 const totalWebsitesElement = document.getElementById("total-websites");
 
-console.log(totalWebsitesElement);
-
-
 const websiteCards = document.querySelectorAll(".website-card")
-
 
 const onlineWebsitesElement = document.getElementById("online-websites");
 
@@ -27,11 +23,9 @@ const totalChecksElement = document.getElementById("total-checks");
 
 function loadTotalChecks() {
 
-    fetch("http://127.0.0.1:8000/stats")
+    return fetch("http://127.0.0.1:8000/stats")
         .then(response => response.json())
         .then(data => {
-            console.log(data);
-
             totalChecksElement.textContent = data.total_checks;
         })
         .catch(error => {
@@ -62,7 +56,7 @@ function loadWebsiteStatus(url, statusElementId, responseTimeElementId) {
 
     const apiUrl = "http://127.0.0.1:8000/checks?url=" + encodeURIComponent(url);
 
-    fetch(apiUrl)
+    return fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
 
@@ -149,36 +143,90 @@ const websiteIds = {
 
 const runAllChecksButton = document.getElementById("run-all-checks");
 
-runAllChecksButton.addEventListener("click", function () {
-    console.log("Run All Checks button clicked!");
+runAllChecksButton.addEventListener("click", async function () {
 
-    monitoredWebsites.forEach(website => {
+    runAllChecksButton.disabled = true;
+    runAllChecksButton.textContent = "Running Checks...";
 
-        fetch("http://127.0.0.1:8000/check", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                url: website
+    try {
+
+        // Run all five checks and wait for every request to finish
+        const checkPromises = monitoredWebsites.map(website => {
+
+            return fetch("http://127.0.0.1:8000/check", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    url: website
+                })
             })
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log("New monitoring result:", data);
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Check failed for " + website);
+                    }
 
-                const websiteId = websiteIds[website];
+                    return response.json();
+                });
 
-                loadWebsiteStatus(
-                    website,
-                    websiteId + "-status",
-                    websiteId + "-response-time"
-                );
+        });
 
-                loadTotalChecks();
-            })
-            .catch(error => {
-                console.error("Error running website check:", error);
-            });
-    });
+        const results = await Promise.allSettled(checkPromises);
+
+        const statsResponse = await fetch("http://127.0.0.1:8000/stats");
+
+        if (!statsResponse.ok) {
+            throw new Error("Failed to retrieve statistics");
+        }
+
+        const stats = await statsResponse.json();
+-
+        console.log("All website checks finished:", results);
+
+        // All checks are finished. Now update the cards together.
+        results.forEach((result, index) => {
+
+            if (result.status !== "fulfilled") {
+                console.error("Website check failed:", result.reason);
+                return;
+            }
+
+            const website = monitoredWebsites[index];
+            const websiteId = websiteIds[website];
+            const check = result.value;
+
+            const statusElement = document.getElementById(websiteId + "-status");
+            const responseTimeElement = document.getElementById(websiteId + "-response-time");
+
+            statusElement.textContent = check.status;
+
+            statusElement.classList.remove("online", "error", "offline");
+            statusElement.classList.add(check.status.toLowerCase());
+
+            if (check.response_time !== null) {
+                responseTimeElement.textContent = check.response_time.toFixed(2) + " ms";
+            } else {
+                responseTimeElement.textContent = "Unavailable";
+            }
+
+        });
+
+        // Update all summary values together
+        updateOnlineCount();
+        totalChecksElement.textContent = stats.total_checks;
+
+
+    } catch (error) {
+
+        console.error("Error running all checks:", error);
+
+    } finally {
+
+        // Only restore the button when everything is finished
+        runAllChecksButton.disabled = false;
+        runAllChecksButton.textContent = "Run All Checks";
+
+    }
+
 });

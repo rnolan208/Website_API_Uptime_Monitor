@@ -129,6 +129,11 @@ main {
     background-color: #1d4ed8;
 }
 
+#run-all-checks:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 @media (max-width: 600px) {
     .website-card {
         align-items: flex-start;
